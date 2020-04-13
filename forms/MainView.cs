@@ -1,5 +1,6 @@
 ﻿using ClickCounter.forms;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -16,8 +17,11 @@ namespace ClickCounter
 
         private Image second;
 
+        private List<SelectionButton> selectionButtons;
+
         public MainView()
         {
+            this.selectionButtons = new List<SelectionButton>();
             InitializeComponent();
             this.TopLevel = true;
 
@@ -28,6 +32,10 @@ namespace ClickCounter
             this.rb_counter1.setCountingLabel(this.lb_counter1);
             this.rb_counter2.setCountingLabel(this.lb_counter2);
             this.rb_counter3.setCountingLabel(this.lb_counter3);
+
+            this.selectionButtons.Add(this.rb_counter1);
+            this.selectionButtons.Add(this.rb_counter2);
+            this.selectionButtons.Add(this.rb_counter3);
         }
 
         private void bt_start_Click(object sender, EventArgs e)
@@ -46,15 +54,24 @@ namespace ClickCounter
             selected.resetCountingLabel();    
         }
 
+        private void resetAllCountingLabels()
+        {
+            foreach (SelectionButton button in this.selectionButtons)
+            {
+                button.resetCountingLabel();
+            }
+        }
+
         private SelectionButton getSelectedRadioButton()
         {
-            if (this.rb_counter1.Checked)
-                return this.rb_counter1;
-            if (this.rb_counter2.Checked)
-                return this.rb_counter2;
-            if (this.rb_counter3.Checked)
-                return this.rb_counter3;
-
+            foreach (SelectionButton button in this.selectionButtons)
+            {
+                if (button.Checked)
+                {
+                    return button;
+                }
+            }
+            
             return null; 
         }
 
@@ -72,6 +89,7 @@ namespace ClickCounter
                 return;
             }
 
+            this.resetAllCountingLabels();
             this.pathToImage = path;
             this.image = new Bitmap(Image.FromFile(path));
             this.pb_picture.Image = this.image;
