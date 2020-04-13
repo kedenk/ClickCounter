@@ -74,6 +74,7 @@
     <Compile Include="controlls\SelectionButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="utils\ScreenService.cs" />
     <EmbeddedResource Include="forms\info.resx">
       <DependentUpon>info.cs</DependentUpon>
     </EmbeddedResource>

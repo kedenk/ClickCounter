@@ -104,10 +104,20 @@ namespace ClickCounter
                 MessageBox.Show("Invalid path to image file.", "Invalid path", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            int imageWindowWidth = this.pb_picture.Width;
+            int imageWindowHeight = this.pb_picture.Height;
 
             this.resetAllCountingLabels();
             this.pathToImage = path;
-            this.image = new Bitmap(Image.FromFile(path));
+            Image loadedImage = Image.FromFile(path);
+            if (loadedImage.Width > imageWindowWidth || loadedImage.Height > imageWindowHeight)
+            {
+                this.image = new Bitmap(loadedImage, new Size(this.pb_picture.Width, this.pb_picture.Height));
+            }
+            else
+            {
+                this.image = new Bitmap(loadedImage);
+            }
             this.pb_picture.Image = this.image;
 
             this.toolStrip_loadedImage.Text = this.pathToImage;
