@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ClickCounter
 {
     static class ImageManipulator
     {
-        private static List<Image> historie = new List<Image>();
+        private static List<Image> imageHistory = new List<Image>();
+        private static List<String> manipulationHistory = new List<String>();
 
         private static PropertyService propSerivice = PropertyService.getInstance();
 
@@ -20,7 +20,7 @@ namespace ClickCounter
         /// <param name="coords"></param>
         /// <param name="color"></param>
         /// <returns></returns>
-        public static Image drawPoint(Image image, Point coords, Color color)
+        public static Image drawPoint(String counterId, Image image, Point coords, Color color)
         {
             if( image == null || coords == null || color == null )
             {
@@ -28,7 +28,7 @@ namespace ClickCounter
             }
 
             
-            addHistoryEntry((Image)image.Clone());
+            addHistoryEntry(counterId, (Image)image.Clone());
 
             Graphics g = Graphics.FromImage(image);
 
@@ -39,33 +39,40 @@ namespace ClickCounter
             return image;
         }
 
-
-        public static Image revertLastManipulation()
+        public static String getLastManipulationId()
         {
-            if( historie.Count > 0 )
-            {
-                // get image before last modification and remove it from list
-                Image i = historie.Last<Image>(); ;
-                historie.RemoveAt(historie.Count - 1);
-                return i;
-            } 
-            else
-            {
-                return null;
-            }
+            return manipulationHistory.LastOrDefault();
         }
 
-        private static void addHistoryEntry(Image image)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static Image revertLastManipulation()
         {
-            if( image != null )
+            if (imageHistory.Count > 0)
+            {
+                // get image before last modification and remove it from list
+                Image i = imageHistory.Last<Image>();
+                imageHistory.RemoveAt(imageHistory.Count - 1);
+                manipulationHistory.RemoveAt(manipulationHistory.Count - 1);
+                return i;
+            }
+
+            return null;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private static void addHistoryEntry(String counterId, Image image)
+        {
+            if( counterId != null && image != null )
             {
                 // if max historie count is reached, remove the oldest entry
-                if( historie.Count >= propSerivice.maxHistorie )
+                if(imageHistory.Count >= propSerivice.maxHistorie )
                 {
-                    historie.RemoveAt(0);
+                    imageHistory.RemoveAt(0);
+                    manipulationHistory.RemoveAt(0);
                 }
 
-                historie.Add(image);
+                imageHistory.Add(image);
+                manipulationHistory.Add(counterId);
             }
         }
     }

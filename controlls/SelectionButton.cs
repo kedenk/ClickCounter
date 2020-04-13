@@ -10,9 +10,20 @@ namespace ClickCounter
 {
     class SelectionButton : RadioButton
     {
+        public String id;
         public Color correspondingColor;
         public Panel colorPanel;
         public Label countingLabel;
+
+        public void setId(String id)
+        {
+            this.id = id;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
 
         public void setcorrespondingColor(Color c)
         {

@@ -26,8 +26,11 @@ namespace ClickCounter
             this.TopLevel = true;
 
             this.rb_counter1.setColorPanel(this.panel1);
+            this.rb_counter1.setId("blue");
             this.rb_counter2.setColorPanel(this.panel2);
+            this.rb_counter2.setId("lime");
             this.rb_counter3.setColorPanel(this.panel3);
+            this.rb_counter3.setId("red");
 
             this.rb_counter1.setCountingLabel(this.lb_counter1);
             this.rb_counter2.setCountingLabel(this.lb_counter2);
@@ -60,6 +63,19 @@ namespace ClickCounter
             {
                 button.resetCountingLabel();
             }
+        }
+
+        private SelectionButton getRadioButtonWithCounterId(String counterId)
+        {
+            foreach (SelectionButton button in this.selectionButtons)
+            {
+                if (button.getId().Equals(counterId))
+                {
+                    return button;
+                }
+            }
+
+            return null;
         }
 
         private SelectionButton getSelectedRadioButton()
@@ -116,7 +132,7 @@ namespace ClickCounter
             if (this.isloadedImage && this.isCounting)
             {
                 MouseEventArgs me = (MouseEventArgs)ev;
-                this.pb_picture.Image = ImageManipulator.drawPoint(this.pb_picture.Image, new Point(me.X, me.Y), this.getSelectedColor());
+                this.pb_picture.Image = ImageManipulator.drawPoint(getSelectedRadioButton().getId(), this.pb_picture.Image, new Point(me.X, me.Y), this.getSelectedColor());
                 this.incClickCounter();
             }
         }
@@ -143,8 +159,17 @@ namespace ClickCounter
             }
         }
 
+        private void decClickCounter(String counterId)
+        {
+            if (this.isCounting && this.isloadedImage)
+            {
+                this.getRadioButtonWithCounterId(counterId).decCountingLabel();
+            }
+        }
+
         private void b_revert_MouseClick(object sender, MouseEventArgs e)
         {
+            String prevManipulationId = ImageManipulator.getLastManipulationId();
             Image previous = ImageManipulator.revertLastManipulation();
             if( previous == null )
             {
@@ -153,7 +178,7 @@ namespace ClickCounter
             }
 
             this.pb_picture.Image = previous;
-            this.decClickCounter();
+            this.decClickCounter(prevManipulationId);
         }
 
         private void loadImageToolStripMenuItem_Click(object sender, EventArgs e)
